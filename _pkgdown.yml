@@ -1,4 +1,6 @@
-url: ~
+url: ctesta01.github.io/Simulacron3
 template:
   bootstrap: 5
+  includes:
+    in_header: "<style> img.logo { width: 200px !important; } </style>"
 
