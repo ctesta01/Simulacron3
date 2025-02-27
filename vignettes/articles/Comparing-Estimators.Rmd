@@ -1,0 +1,93 @@
+---
+title: "Comparing Estimators"
+---
+
+A famous example of a statistical inference problem where a faster than
+$\sqrt{n}$ rate of convergence is possible is that of inferring the $\theta$
+parameter in a $\mathrm{Uniform}(0, \theta)$ model. 
+
+We will show how a moments based estimator converges slower than 
+an order statistic based estimator empirically using `{Simulacron3}`. 
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+For our first estimator, we will take 
+$$
+\hat{\theta}_{n,\,\text{MoM}} = \sqrt{\frac{3}{n} \sum_{i=1}^n X_i^2}.
+$$
+
+Our second estimator will be 
+$$
+\hat{\theta}_{n,\,\mathrm{max}} = \frac{n+1}{n} \max_{i\in 1,...,n} |X_i|
+$$
+
+
+```{r setup}
+#| fig-width: 8
+#| fig-height: 5
+#| fig-dpi: 300
+#| fig-retina: 3
+library(Simulacron3)
+suppressMessages(library(dplyr))
+library(ggplot2)
+library(tidyr)
+
+# we can fix a true value or even set it to be random as long as we record it.
+theta <- 10
+
+# here's our data generating process (dgp):
+unif_dgp <- function(n) {
+  runif(n = n, min = 0, max = theta)
+}
+
+estimator1 <- function(x) {
+  sqrt(3/length(x) * sum(x^2))
+}
+
+estimator2 <- function(x) {
+  (length(x)+1)/(length(x)) * max(x)
+}
+
+summary_func <- function(iter = NULL, est_results, data = NULL) {
+  data.frame(
+    estimator1 = est_results$estimator1,
+    estimator2 = est_results$estimator2)
+}
+
+sim <- Simulation$new()
+sim$set_dgp(unif_dgp)
+sim$set_estimators(list(estimator1 = estimator1, estimator2 = estimator2))
+sim$set_summary_stats(summary_func)
+
+# setup a data frame to store results in across sample sizes
+results <- data.frame()
+for (sample_size_i in c(10, 30, 100, 300)) {
+  sim$set_config(list(sample_size = sample_size_i))
+  sim$run()
+  results <- dplyr::bind_rows(
+    results,
+    cbind(sample_size = sample_size_i, sim$get_results()))
+}
+
+results <- results |> tidyr::pivot_longer(cols = starts_with('estimator'),
+                                          values_to = 'estimate',
+                                          names_to = 'estimator')
+  
+library(ggplot2)
+ggplot(results, aes(x = factor(sample_size), y = estimate,
+                    color = estimator, shape = estimator)) + 
+  geom_jitter(position = position_jitterdodge(dodge.width = .35, jitter.width = .10)) + 
+  geom_boxplot(outlier.color = NA, alpha = 0.5, width = .35) + 
+  theme_bw() + 
+  scale_color_brewer(palette = 'Set2') + 
+  ggtitle("Comparison of Estimators", "Each sample size was simulated 100 times") + 
+  labs(x = "Sample Size", y = "Estimate") 
+```
+
+We can see that we were right: `estimator2` is converging 
+quite a bit faster than `estimator1`. 
