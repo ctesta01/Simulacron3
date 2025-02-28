@@ -5,24 +5,26 @@ output: github_document
 # `{Simulacron3}` <img src='man/figures/logo.png' style="float:right; height:200px;" align='right' />
 
 The purpose of the `{Simulacron3}` package is to provide easy-to-use boilerplate
-functionality for simple simulation studies. The most common, archetypal example
-of a usecase would be comparing the performance of multiple estimators as the
+functionality for simple simulation studies. The most archetypal example
+of a usecase is comparing the performance of multiple estimators as the
 sample size of training data increases.
 
 A fundamental thesis of this package is that many simulation studies (of the
 statistical performance of estimators) follow the following workflow:
 
-![](man/figures/DiagrammeR diagram-1.png)
+![A flow diagram with simulation (sim) in the middle, data generating process (dgp), estimators, and config (iterations, sample sizes, etc) leading into it, and out of the simulation coming summary statistics.](man/figures/simulation_diagram.png)
 
 ## Demonstration
 
 ```{r}
 library(Simulacron3)
+# the only thing Simulacron3 contains is the Simulation R6 Class, used below
+
 # Example Usage
 # Define a data generating process
 dgp <- function(n) data.frame(x = rnorm(n), y = rnorm(n))
 
-# Define some estimators
+# Define some estimators 
 estimators <- list(
   mean_estimator = function(data) mean(data$x),
   var_estimator = function(data) var(data$x)
@@ -47,7 +49,7 @@ sim <- Simulation$new()
 # Set up the simulation
 sim$set_dgp(dgp)
 sim$set_estimators(estimators)
-sim$set_config(list(replications = 500, sample_size = 50))
+sim$set_config(list(replications = 5000, sample_size = 500))
 sim$set_summary_stats(summary_func)
 
 # Run the simulation
@@ -57,6 +59,32 @@ sim$run()
 results <- sim$get_results()
 head(results)
 ```
+
+See <https://ctesta01.github.io/Simulacron3/articles/Comparing-Estimators.html> for
+a slightly more involved example.
+
+## Parallelization 
+
+Parallelization is supported, and as simple as passing `parallel = TRUE` 
+to the `config` for your simulation and declaring a `plan(multisession)` 
+with the `{future}` package. 
+
+```{r}
+#| cache: true
+library(microbenchmark)
+
+# let's benchmark the simulation we specified above 
+microbenchmark::microbenchmark(sim$run(), times = 10)
+
+# just change the config to run in parallel
+sim$set_config(list(parallel = TRUE)) 
+future::plan(future::multisession) # setup an appropriate future::plan 
+microbenchmark::microbenchmark(sim$run(), times = 10)
+```
+
+Underlying this is usage of the `{future.apply}` package. See 
+<https://future.futureverse.org/> for a description of the 
+types of plans that can be specified.
 
 ## Package Internals 
 
@@ -81,7 +109,7 @@ probably not "real" and might be only a computer-generated simulation.
 
 ## Other Related Works
 
-`{Simulacron3}` is one of many attempts to standardize the workflow of running
+`{Simulacron3}` is one of many attempts to help with the workflow of running
 simulations. A lot of inspiration was taken from: 
 
   - [simChef](https://github.com/Yu-Group/simChef)

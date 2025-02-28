@@ -21,8 +21,7 @@
 #' @field dgp A function that takes a single argument \code{n} for sample size and generates synthetic data.
 #' @field estimators A list of estimators that each can be called on the data
 #' @field config A list containing at least the number of \code{replications} to
-#'   perform, the \code{sample_size} to use, whether or not the simulation
-#'   should be \code{quiet}, and whether or not to run in \code{parallel}.
+#'   perform, the \code{sample_size} to use, and whether or not to run in \code{parallel}.
 #' @field summary_stats A list of summary statistic functions that can be called on the estimates produced
 #' @field results A data.frame of results from running the simulation
 #' @field initialize Method to initialize the simulation object (does nothing)
@@ -36,7 +35,7 @@
 #' @field set_config Method to set the configuration
 #' @param config_list A list of configuration settings for the simulation.
 #' The following are used by \code{Simulacron3::Simulation} by default:
-#' \code{replications} (integer), \code{sample_size}, \code{quiet}
+#' \code{replications} (integer), \code{sample_size},
 #' and \code{parallel}.
 #' @field get_results Method to retrieve results
 #' @field set_summary_stats Method to set summary statistics
@@ -84,7 +83,7 @@ Simulation <- R6::R6Class("Simulation",
 
     dgp = NULL,
     estimators = NULL,
-    config = list(replications = 100, sample_size = 100, quiet = FALSE, parallel = FALSE),
+    config = list(replications = 100, sample_size = 100, parallel = FALSE),
     summary_stats = NULL,
     results = NULL,
 
@@ -124,20 +123,16 @@ Simulation <- R6::R6Class("Simulation",
         stop("Please set dgp, estimators, and summary_stats before running the simulation.")
       }
 
-      if (! self$config$quiet) {
-        message("Running simulation...")
-      }
-
-      replications <- self$config$replications
-      sample_size <- self$config$sample_size
-      sim_results <- vector("list", replications)
+      replications <- self$config$replications # how many times to run the simulation
+      sample_size <- self$config$sample_size   # how large each simulation is
+      sim_results <- vector("list", replications) # output to a list of rows per simulation
 
       if (! isTRUE(self$config$parallel)) {
-        for (i in seq_len(replications)) {
+        sim_results <- lapply(seq_len(replications), function(i) {
           data <- self$dgp(sample_size)
           est_results <- lapply(self$estimators, function(estimator) estimator(data))
-          sim_results[[i]] <- self$summary_stats(i, est_results, data)
-        }
+          return(self$summary_stats(i, est_results, data))
+        })
       } else if (isTRUE(self$config$parallel)) {
         sim_results <- future_lapply(seq_len(replications), function(i) {
           data <- self$dgp(sample_size)

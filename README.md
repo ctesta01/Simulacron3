@@ -3,25 +3,33 @@
 
 The purpose of the `{Simulacron3}` package is to provide easy-to-use
 boilerplate functionality for simple simulation studies. The most
-common, archetypal example of a usecase would be comparing the
-performance of multiple estimators as the sample size of training data
-increases.
+archetypal example of a usecase is comparing the performance of multiple
+estimators as the sample size of training data increases.
 
 A fundamental thesis of this package is that many simulation studies (of
 the statistical performance of estimators) follow the following
 workflow:
 
-![](man/figures/DiagrammeR%20diagram-1.png)
+<figure>
+<img src="man/figures/simulation_diagram.png"
+alt="A flow diagram with simulation (sim) in the middle, data generating process (dgp), estimators, and config (iterations, sample sizes, etc) leading into it, and out of the simulation coming summary statistics." />
+<figcaption aria-hidden="true">A flow diagram with simulation (sim) in
+the middle, data generating process (dgp), estimators, and config
+(iterations, sample sizes, etc) leading into it, and out of the
+simulation coming summary statistics.</figcaption>
+</figure>
 
 ## Demonstration
 
 ``` r
-library(Simulacron3)
+library(Simulacron3) 
+# the only thing Simulacron3 contains is the Simulation R6 Class, used below
+
 # Example Usage
 # Define a data generating process
 dgp <- function(n) data.frame(x = rnorm(n), y = rnorm(n))
 
-# Define some estimators
+# Define some estimators 
 estimators <- list(
   mean_estimator = function(data) mean(data$x),
   var_estimator = function(data) var(data$x)
@@ -46,28 +54,63 @@ sim <- Simulation$new()
 # Set up the simulation
 sim$set_dgp(dgp)
 sim$set_estimators(estimators)
-sim$set_config(list(replications = 500, sample_size = 50))
+sim$set_config(list(replications = 5000, sample_size = 500))
 sim$set_summary_stats(summary_func)
 
 # Run the simulation
 sim$run()
-```
 
-    ## Running simulation...
-
-``` r
 # Retrieve results
 results <- sim$get_results()
 head(results)
 ```
 
-    ##      mean_est   var_est
-    ## 1 -0.20494572 1.3920098
-    ## 2  0.15280055 0.9840259
-    ## 3  0.10258454 1.1538128
-    ## 4 -0.03797317 0.8290765
-    ## 5 -0.27130453 0.9588148
-    ## 6 -0.12555804 1.1249785
+    ##       mean_est   var_est
+    ## 1 -0.000358145 1.0029123
+    ## 2  0.014233217 0.9832642
+    ## 3 -0.053425707 0.9297267
+    ## 4  0.004113618 1.0936967
+    ## 5 -0.084775258 0.9653678
+    ## 6  0.022799863 1.0084176
+
+See
+<https://ctesta01.github.io/Simulacron3/articles/Comparing-Estimators.html>
+for a slightly more involved example.
+
+## Parallelization
+
+Parallelization is supported, and as simple as passing `parallel = TRUE`
+to the `config` for your simulation and declaring a `plan(multisession)`
+with the `{future}` package.
+
+``` r
+library(microbenchmark)
+
+# let's benchmark the simulation we specified above 
+microbenchmark::microbenchmark(sim$run(), times = 10)
+```
+
+    ## Warning in microbenchmark::microbenchmark(sim$run(), times = 10): less accurate
+    ## nanosecond times to avoid potential integer overflows
+
+    ## Unit: milliseconds
+    ##       expr      min       lq     mean   median       uq      max neval
+    ##  sim$run() 824.2277 838.2386 846.9038 844.4248 852.6623 886.7453    10
+
+``` r
+# just change the config to run in parallel
+sim$set_config(list(parallel = TRUE)) 
+future::plan(future::multisession) # setup an appropriate future::plan 
+microbenchmark::microbenchmark(sim$run(), times = 10)
+```
+
+    ## Unit: milliseconds
+    ##       expr      min       lq     mean   median       uq     max neval
+    ##  sim$run() 589.8162 597.6803 676.0713 613.2764 619.8425 964.878    10
+
+Underlying this is usage of the `{future.apply}` package. See
+<https://future.futureverse.org/> for a description of the types of
+plans that can be specified.
 
 ## Package Internals
 
@@ -94,7 +137,7 @@ To quote Wikipedia:
 
 ## Other Related Works
 
-`{Simulacron3}` is one of many attempts to standardize the workflow of
+`{Simulacron3}` is one of many attempts to help with the workflow of
 running simulations. A lot of inspiration was taken from:
 
 - [simChef](https://github.com/Yu-Group/simChef)

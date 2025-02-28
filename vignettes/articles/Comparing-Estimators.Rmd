@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 For our first estimator, we will take 
 $$
-\hat{\theta}_{n,\,\text{MoM}} = \sqrt{\frac{3}{n} \sum_{i=1}^n X_i^2}.
+\hat{\theta}_{n,\,\text{moments}} = \sqrt{\frac{3}{n} \sum_{i=1}^n X_i^2}.
 $$
 
 Our second estimator will be 
@@ -45,49 +45,77 @@ unif_dgp <- function(n) {
   runif(n = n, min = 0, max = theta)
 }
 
+# here are our two candidate estimators that we want to compare across simulations
 estimator1 <- function(x) {
   sqrt(3/length(x) * sum(x^2))
 }
-
 estimator2 <- function(x) {
   (length(x)+1)/(length(x)) * max(x)
 }
 
+# our summary is just going to be to retrieve the estimators from each simulation
 summary_func <- function(iter = NULL, est_results, data = NULL) {
   data.frame(
     estimator1 = est_results$estimator1,
     estimator2 = est_results$estimator2)
 }
 
+# setup our simulation
 sim <- Simulation$new()
 sim$set_dgp(unif_dgp)
 sim$set_estimators(list(estimator1 = estimator1, estimator2 = estimator2))
 sim$set_summary_stats(summary_func)
 
 # setup a data frame to store results in across sample sizes
-results <- data.frame()
-for (sample_size_i in c(10, 30, 100, 300)) {
-  sim$set_config(list(sample_size = sample_size_i))
+results <- list()
+
+# run the simulation over a variety of sample sizes
+sample_sizes <- c(10, 30, 100, 300)
+for (i in 1:length(sample_sizes)) {
+  sim$set_config(list(sample_size = sample_sizes[i]))
   sim$run()
-  results <- dplyr::bind_rows(
-    results,
-    cbind(sample_size = sample_size_i, sim$get_results()))
+  results[[i]] <-
+    dplyr::bind_cols(sample_size = sample_sizes[i], sim$get_results())
 }
 
-results <- results |> tidyr::pivot_longer(cols = starts_with('estimator'),
-                                          values_to = 'estimate',
-                                          names_to = 'estimator')
+# combine our results together and pivot for ggplot2
+results <- results |>
+  dplyr::bind_rows() |>
+  tidyr::pivot_longer(
+    cols = starts_with('estimator'),
+    values_to = 'estimate',
+    names_to = 'estimator'
+  )
   
-library(ggplot2)
-ggplot(results, aes(x = factor(sample_size), y = estimate,
-                    color = estimator, shape = estimator)) + 
-  geom_jitter(position = position_jitterdodge(dodge.width = .35, jitter.width = .10)) + 
-  geom_boxplot(outlier.color = NA, alpha = 0.5, width = .35) + 
-  theme_bw() + 
-  scale_color_brewer(palette = 'Set2') + 
-  ggtitle("Comparison of Estimators", "Each sample size was simulated 100 times") + 
-  labs(x = "Sample Size", y = "Estimate") 
+# produce a nice ggplot2 of the simulation results
+results |>
+  mutate(estimator_name = case_when(
+    estimator == 'estimator1' ~ c(bquote(hat(theta)[1])),
+    estimator == 'estimator2' ~ c(bquote(hat(theta)[2]))
+  )) |>
+  ggplot(aes(
+    x = factor(sample_size),
+    y = estimate,
+    color = estimator,
+    shape = estimator
+  )) +
+  geom_jitter(position = position_jitterdodge(dodge.width = .35, jitter.width = .10)) +
+  geom_boxplot(outlier.color = NA,
+               alpha = 0.5,
+               width = .35) +
+  theme_bw() +
+  scale_color_brewer(
+    palette = 'Set2', 
+    labels = c(estimator1 = bquote(paste(hat(theta)["n, moments"])), 
+               estimator2 = bquote(hat(theta)["n, max"]))) +
+  scale_shape_discrete(
+    labels = c(estimator1 = bquote(paste(hat(theta)["n, moments"])), 
+               estimator2 = bquote(hat(theta)["n, max"]))) +
+  ggtitle("Comparison of Estimators",
+          "100 simulations at each sample size were performed") +
+  labs(x = "Sample Size", y = "Estimate")  + 
+  theme(legend.position = 'bottom')
 ```
 
-We can see that we were right: `estimator2` is converging 
-quite a bit faster than `estimator1`. 
+We can see that we were right to expect from theory that `estimator2` or $\hat{\theta}_{n,\, \text{max}}$ would converge 
+quite a bit faster than `estimator1` or $\hat{\theta}_{n,\, \text{moments}}$. 
