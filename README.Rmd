@@ -54,7 +54,7 @@ sim$run()
 # Retrieve results
 results <- sim$get_results()
 head(results)
-```
+``
 
 ## Other Related Works
 

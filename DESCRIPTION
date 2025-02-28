@@ -4,11 +4,15 @@ Version: 0.0.001
 Authors@R: 
     person("Christian", "Testa", , "ctesta@hsph.harvard.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9103-5839"))
+Author: Christian Testa
+Maintainer: Christian Testa <ctesta@hsph.harvard.edu>
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
+    future.apply,
     R6
 Config/Needs/website: rmarkdown
+URL: https://ctesta01.github.io/Simulacron3/

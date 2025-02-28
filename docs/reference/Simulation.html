@@ -3,7 +3,7 @@
 list of estimators, config, list of summary_statistics to compute, and
 provides a get_results method."><meta property="og:description" content="Takes a specification for a data generating process (dgp),
 list of estimators, config, list of summary_statistics to compute, and
-provides a get_results method."><meta property="og:image" content="ctesta01.github.io/Simulacron3/logo.png"><style> img.logo { width: 200px !important; } </style></head><body>
+provides a get_results method."><meta property="og:image" content="https://ctesta01.github.io/Simulacron3/logo.png"><style> img.logo { width: 200px !important; } </style></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -58,6 +58,92 @@ of the estimators considered). This is represented by the following pipeline:</p
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  summary_fns</span></code></pre><p></p></div>
     </div>
     <div class="section level2">
+    <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
+    <p></p><div class="r6-fields"><dl><dt><code>dgp</code></dt>
+<dd><p>A function that takes a single argument <code>n</code> for sample size and generates synthetic data.</p></dd>
+
+
+<dt><code>estimators</code></dt>
+<dd><p>A list of estimators that each can be called on the data</p></dd>
+
+
+<dt><code>config</code></dt>
+<dd><p>A list containing at least the number of <code>replications</code> to
+perform, the <code>sample_size</code> to use, whether or not the simulation
+should be <code>quiet</code>, and whether or not to run in <code>parallel</code>.</p></dd>
+
+
+<dt><code>summary_stats</code></dt>
+<dd><p>A list of summary statistic functions that can be called on the estimates produced</p></dd>
+
+
+<dt><code>results</code></dt>
+<dd><p>A data.frame of results from running the simulation</p></dd>
+
+
+<dt><code>initialize</code></dt>
+<dd><p>Method to initialize the simulation object (does nothing)</p></dd>
+
+
+<dt><code>set_dgp</code></dt>
+<dd><p>Method to set the data generating process</p></dd>
+
+
+<dt><code>set_estimators</code></dt>
+<dd><p>Method to set the estimators</p></dd>
+
+
+<dt><code>set_config</code></dt>
+<dd><p>Method to set the configuration</p></dd>
+
+
+<dt><code>get_results</code></dt>
+<dd><p>Method to retrieve results</p></dd>
+
+
+<dt><code>set_summary_stats</code></dt>
+<dd><p>Method to set summary statistics</p></dd>
+
+
+<dt><code>run</code></dt>
+<dd><p>Method to run the simulation</p></dd>
+
+
+</dl><p></p></div>
+    </div>
+    <div class="section level2">
+    <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
+    <p></p><div class="r6-active-bindings"><dl><dt><code>initialize</code></dt>
+<dd><p>Method to initialize the simulation object (does nothing)</p></dd>
+
+
+<dt><code>set_dgp</code></dt>
+<dd><p>Method to set the data generating process</p></dd>
+
+
+<dt><code>set_estimators</code></dt>
+<dd><p>Method to set the estimators</p></dd>
+
+
+<dt><code>set_config</code></dt>
+<dd><p>Method to set the configuration</p></dd>
+
+
+<dt><code>get_results</code></dt>
+<dd><p>Method to retrieve results</p></dd>
+
+
+<dt><code>set_summary_stats</code></dt>
+<dd><p>Method to set summary statistics</p></dd>
+
+
+<dt><code>run</code></dt>
+<dd><p>Method to run the simulation</p></dd>
+
+
+</dl><p></p></div>
+    </div>
+    <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
 
 <div class="section">
@@ -88,6 +174,16 @@ of the estimators considered). This is represented by the following pipeline:</p
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Simulation</span><span class="op">$</span><span class="fu">set_dgp</span><span class="op">(</span><span class="va">dgp_func</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>dgp_func</code></dt>
+<dd><p>A data generating process function (of one argument,
+<code>n</code>) that produces a dataset for simulation purposes of the sample
+size given.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Simulation-set_estimators"></a><div class="section">
 <h3 id="method-set-estimators-">Method <code>set_estimators()</code><a class="anchor" aria-label="anchor" href="#method-set-estimators-"></a></h3>
@@ -97,6 +193,15 @@ of the estimators considered). This is represented by the following pipeline:</p
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Simulation</span><span class="op">$</span><span class="fu">set_estimators</span><span class="op">(</span><span class="va">estimator_list</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>estimator_list</code></dt>
+<dd><p>A list of functions that can be evaluated on the data
+output from the data generating process <code>self$dgp</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Simulation-set_config"></a><div class="section">
 <h3 id="method-set-config-">Method <code>set_config()</code><a class="anchor" aria-label="anchor" href="#method-set-config-"></a></h3>
@@ -106,6 +211,17 @@ of the estimators considered). This is represented by the following pipeline:</p
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Simulation</span><span class="op">$</span><span class="fu">set_config</span><span class="op">(</span><span class="va">config_list</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>config_list</code></dt>
+<dd><p>A list of configuration settings for the simulation.
+The following are used by <code>Simulacron3::Simulation</code> by default:
+<code>replications</code> (integer), <code>sample_size</code>, <code>quiet</code>
+and <code>parallel</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Simulation-set_summary_stats"></a><div class="section">
 <h3 id="method-set-summary-stats-">Method <code>set_summary_stats()</code><a class="anchor" aria-label="anchor" href="#method-set-summary-stats-"></a></h3>
@@ -115,6 +231,15 @@ of the estimators considered). This is represented by the following pipeline:</p
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Simulation</span><span class="op">$</span><span class="fu">set_summary_stats</span><span class="op">(</span><span class="va">summary_func</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>summary_func</code></dt>
+<dd><p>The summary function to set for the simulation. <code>summary_func</code> should take
+as arguments <code>i, est_results, data</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Simulation-run"></a><div class="section">
 <h3 id="method-run-">Method <code>run()</code><a class="anchor" aria-label="anchor" href="#method-run-"></a></h3>
@@ -142,7 +267,7 @@ of the estimators considered). This is represented by the following pipeline:</p
 </div>
 
 <div class="section">
-<h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

@@ -79,7 +79,7 @@ parameter in a
 model.</p>
 <p>We will show how a moments based estimator converges slower than an
 order statistic based estimator empirically using
-<code>{Simulacron3}</code>.</p>
+<a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a>.</p>
 <p>For our first estimator, we will take
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mrow><mi>n</mi><mo>,</mo><mspace width="0.167em"></mspace><mtext mathvariant="normal">MoM</mtext></mrow></msub><mo>=</mo><msqrt><mrow><mfrac><mn>3</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msubsup><mi>X</mi><mi>i</mi><mn>2</mn></msubsup></mrow></msqrt><mi>.</mi></mrow><annotation encoding="application/x-tex">
 \hat{\theta}_{n,\,\text{MoM}} = \sqrt{\frac{3}{n} \sum_{i=1}^n X_i^2}.
@@ -89,7 +89,7 @@ order statistic based estimator empirically using
 \hat{\theta}_{n,\,\mathrm{max}} = \frac{n+1}{n} \max_{i\in 1,...,n} |X_i|
 </annotation></semantics></math></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">Simulacron3</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>

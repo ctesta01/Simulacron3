@@ -16,6 +16,32 @@
 #'       summary_fns
 #'
 #' @export
+#' @importFrom future.apply future_lapply
+#'
+#' @field dgp A function that takes a single argument \code{n} for sample size and generates synthetic data.
+#' @field estimators A list of estimators that each can be called on the data
+#' @field config A list containing at least the number of \code{replications} to
+#'   perform, the \code{sample_size} to use, whether or not the simulation
+#'   should be \code{quiet}, and whether or not to run in \code{parallel}.
+#' @field summary_stats A list of summary statistic functions that can be called on the estimates produced
+#' @field results A data.frame of results from running the simulation
+#' @field initialize Method to initialize the simulation object (does nothing)
+#' @field set_dgp Method to set the data generating process
+#' @param dgp_func A data generating process function (of one argument,
+#'   \code{n}) that produces a dataset for simulation purposes of the sample
+#'   size given.
+#' @field set_estimators Method to set the estimators
+#' @param estimator_list A list of functions that can be evaluated on the data
+#' output from the data generating process \code{self$dgp}.
+#' @field set_config Method to set the configuration
+#' @param config_list A list of configuration settings for the simulation.
+#' The following are used by \code{Simulacron3::Simulation} by default:
+#' \code{replications} (integer), \code{sample_size}, \code{quiet}
+#' and \code{parallel}.
+#' @field get_results Method to retrieve results
+#' @field set_summary_stats Method to set summary statistics
+#' @param summary_func The summary function to set for the simulation. \code{summary_func} should take
+#' as arguments \code{i, est_results, data}.
 #'
 #' @examples
 #' \dontrun{
@@ -56,22 +82,14 @@
 Simulation <- R6::R6Class("Simulation",
   public = list(
 
-    #' @field dgp A function that takes a single argument \code{n} for sample size and generates synthetic data.
     dgp = NULL,
-    #' @field estimators A list of estimators that each can be called on the data
     estimators = NULL,
-    #' @field config A list containing at least the number of replications to
-    #'   perform, the sample size to use, and whether or not the simulation
-    #'   should be quiet.
-    config = list(replications = 100, sample_size = 100, quiet = FALSE),
-    #' @field summary_stats A list of summary statistic functions that can be called on the estimates produced
+    config = list(replications = 100, sample_size = 100, quiet = FALSE, parallel = FALSE),
     summary_stats = NULL,
     results = NULL,
 
-    # Method to initialize the simulation object
     initialize = function() {},
 
-    # Method to set the data generating process
     set_dgp = function(dgp_func) {
       if (!is.function(dgp_func)) {
         stop("dgp must be a function.")
@@ -79,7 +97,6 @@ Simulation <- R6::R6Class("Simulation",
       self$dgp <- dgp_func
     },
 
-    # Method to set the estimators
     set_estimators = function(estimator_list) {
       if (!is.list(estimator_list) || !all(sapply(estimator_list, is.function))) {
         stop("estimators must be a list of functions.")
@@ -87,7 +104,6 @@ Simulation <- R6::R6Class("Simulation",
       self$estimators <- estimator_list
     },
 
-    # Method to set the configuration
     set_config = function(config_list) {
       if (!is.list(config_list)) {
         stop("config must be a list.")
@@ -95,7 +111,6 @@ Simulation <- R6::R6Class("Simulation",
       self$config <- modifyList(self$config, config_list)
     },
 
-    # Method to set summary statistics
     set_summary_stats = function(summary_func) {
       if (!is.function(summary_func)) {
         stop("summary_stats must be a function.")
@@ -103,7 +118,7 @@ Simulation <- R6::R6Class("Simulation",
       self$summary_stats <- summary_func
     },
 
-    # Method to run the simulation
+    #' @field run Method to run the simulation
     run = function() {
       if (is.null(self$dgp) || is.null(self$estimators) || is.null(self$summary_stats)) {
         stop("Please set dgp, estimators, and summary_stats before running the simulation.")
@@ -117,16 +132,24 @@ Simulation <- R6::R6Class("Simulation",
       sample_size <- self$config$sample_size
       sim_results <- vector("list", replications)
 
-      for (i in seq_len(replications)) {
-        data <- self$dgp(sample_size)
-        est_results <- lapply(self$estimators, function(estimator) estimator(data))
-        sim_results[[i]] <- self$summary_stats(i, est_results, data)
+      if (! isTRUE(self$config$parallel)) {
+        for (i in seq_len(replications)) {
+          data <- self$dgp(sample_size)
+          est_results <- lapply(self$estimators, function(estimator) estimator(data))
+          sim_results[[i]] <- self$summary_stats(i, est_results, data)
+        }
+      } else if (isTRUE(self$config$parallel)) {
+        sim_results <- future_lapply(seq_len(replications), function(i) {
+          data <- self$dgp(sample_size)
+          est_results <- lapply(self$estimators, function(estimator) estimator(data))
+          return(self$summary_stats(i, est_results, data))
+        }, future.seed = TRUE)
       }
 
       self$results <- do.call(rbind, sim_results)
+      return(invisible(NULL))
     },
 
-    # Method to retrieve results
     get_results = function() {
       if (is.null(self$results)) {
         stop("No results available. Run the simulation first.")
