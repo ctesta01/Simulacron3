@@ -71,16 +71,10 @@ results <- list()
 
 # run the simulation over a variety of sample sizes
 sample_sizes <- c(10, 30, 100, 300)
-for (i in 1:length(sample_sizes)) {
-  sim$set_config(list(sample_size = sample_sizes[i]))
-  sim$run()
-  results[[i]] <-
-    dplyr::bind_cols(sample_size = sample_sizes[i], sim$get_results())
-}
+results <- Simulacron3::run_simulation_study(sim, sample_sizes)
 
 # combine our results together and pivot for ggplot2
 results <- results |>
-  dplyr::bind_rows() |>
   tidyr::pivot_longer(
     cols = starts_with('estimator'),
     values_to = 'estimate',
@@ -99,7 +93,10 @@ results |>
     color = estimator,
     shape = estimator
   )) +
-  geom_jitter(position = position_jitterdodge(dodge.width = .35, jitter.width = .10)) +
+  geom_jitter(
+    position = position_jitterdodge(dodge.width = .35, 
+                                    jitter.width = .10),
+    alpha = .7) +
   geom_boxplot(outlier.color = NA,
                alpha = 0.5,
                width = .35) +

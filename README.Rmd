@@ -14,6 +14,18 @@ statistical performance of estimators) follow the following workflow:
 
 ![A flow diagram with simulation (sim) in the middle, data generating process (dgp), estimators, and config (iterations, sample sizes, etc) leading into it, and out of the simulation coming summary statistics.](man/figures/simulation_diagram.png)
 
+## Main products
+
+`{Simulacron3}` exports very little: just the following object and function: 
+
+  * `Simulation` — use `Simulation$new()` to set up a new simulation.  We take a 
+  simulation to be a repeated experiment of _the same configuration_. We refer
+  to repetitions of the same experiment as `replications`. 
+  * `run_simulation_study()` — A function for running a `Simulation` across 
+  varied sample sizes. 
+  
+See `?Simulation` and `?run_simulation_study()`.
+
 ## Demonstration
 
 ```{r}
@@ -57,6 +69,7 @@ sim$run()
 
 # Retrieve results
 results <- sim$get_results()
+
 head(results)
 ```
 
@@ -90,10 +103,10 @@ types of plans that can be specified.
 
 `{Simulacron3}` is meant to have easy to understand source code (and
 not too much of it) so that users can easily reason about what to expect
-from their simulations. Check out the source, especially for the `$run()` method
-here: 
+from their simulations. Check out the source, especially for the `$run()` method of the `Simulation` class and the `run_simulation_study()` method: 
 
   - <https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R>
+  - <https://github.com/ctesta01/Simulacron3/blob/main/R/run_simulation_study.R>
 
 ### Package Title Inspiration
 
