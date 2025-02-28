@@ -69,10 +69,22 @@
 <figure><img src="reference/figures/simulation_diagram.png" alt="A flow diagram with simulation (sim) in the middle, data generating process (dgp), estimators, and config (iterations, sample sizes, etc) leading into it, and out of the simulation coming summary statistics."><figcaption aria-hidden="true">
 A flow diagram with simulation (sim) in the middle, data generating process (dgp), estimators, and config (iterations, sample sizes, etc) leading into it, and out of the simulation coming summary statistics.
 </figcaption></figure><div class="section level2">
+<h2 id="main-products">Main products<a class="anchor" aria-label="anchor" href="#main-products"></a>
+</h2>
+<p><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a> exports very little: just the following object and function:</p>
+<ul>
+<li>
+<code>Simulation</code> — use <code>Simulation$new()</code> to set up a new simulation. We take a simulation to be a repeated experiment of <em>the same configuration</em>. We refer to repetitions of the same experiment as <code>replications</code>.</li>
+<li>
+<code><a href="reference/run_simulation_study.html">run_simulation_study()</a></code> — A function for running a <code>Simulation</code> across varied sample sizes.</li>
+</ul>
+<p>See <code><a href="reference/Simulation.html">?Simulation</a></code> and <code>?run_simulation_study()</code>.</p>
+</div>
+<div class="section level2">
 <h2 id="demonstration">Demonstration<a class="anchor" aria-label="anchor" href="#demonstration"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a></span><span class="op">)</span> </span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a></span><span class="op">)</span></span>
 <span><span class="co"># the only thing Simulacron3 contains is the Simulation R6 Class, used below</span></span>
 <span></span>
 <span><span class="co"># Example Usage</span></span>
@@ -112,14 +124,15 @@ A flow diagram with simulation (sim) in the middle, data generating process (dgp
 <span></span>
 <span><span class="co"># Retrieve results</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="va">sim</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="do">##       mean_est   var_est</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="do">## 1 -0.000358145 1.0029123</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="do">## 2  0.014233217 0.9832642</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="do">## 3 -0.053425707 0.9297267</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="do">## 4  0.004113618 1.0936967</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="do">## 5 -0.084775258 0.9653678</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="do">## 6  0.022799863 1.0084176</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="do">##      mean_est   var_est</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="do">## 1 -0.02437416 0.9572821</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="do">## 2  0.04051167 1.0650267</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="do">## 3  0.05319980 0.9792816</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="do">## 4  0.01356421 1.0589115</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="do">## 5  0.09553885 1.0395503</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="do">## 6  0.01013093 0.9762941</span></span></code></pre></div>
 <p>See <a href="https://ctesta01.github.io/Simulacron3/articles/Comparing-Estimators.html" class="uri">https://ctesta01.github.io/Simulacron3/articles/Comparing-Estimators.html</a> for a slightly more involved example.</p>
 </div>
 <div class="section level2">
@@ -150,9 +163,10 @@ A flow diagram with simulation (sim) in the middle, data generating process (dgp
 <div class="section level2">
 <h2 id="package-internals">Package Internals<a class="anchor" aria-label="anchor" href="#package-internals"></a>
 </h2>
-<p><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a> is meant to have easy to understand source code (and not too much of it) so that users can easily reason about what to expect from their simulations. Check out the source, especially for the <code>$run()</code> method here:</p>
+<p><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a> is meant to have easy to understand source code (and not too much of it) so that users can easily reason about what to expect from their simulations. Check out the source, especially for the <code>$run()</code> method of the <code>Simulation</code> class and the <code><a href="reference/run_simulation_study.html">run_simulation_study()</a></code> method:</p>
 <ul>
 <li><a href="https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R" class="external-link uri">https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R</a></li>
+<li><a href="https://github.com/ctesta01/Simulacron3/blob/main/R/run_simulation_study.R" class="external-link uri">https://github.com/ctesta01/Simulacron3/blob/main/R/run_simulation_study.R</a></li>
 </ul>
 <div class="section level3">
 <h3 id="package-title-inspiration">Package Title Inspiration<a class="anchor" aria-label="anchor" href="#package-title-inspiration"></a>

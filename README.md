@@ -19,10 +19,24 @@ the middle, data generating process (dgp), estimators, and config
 simulation coming summary statistics.</figcaption>
 </figure>
 
+## Main products
+
+`{Simulacron3}` exports very little: just the following object and
+function:
+
+- `Simulation` — use `Simulation$new()` to set up a new simulation. We
+  take a simulation to be a repeated experiment of *the same
+  configuration*. We refer to repetitions of the same experiment as
+  `replications`.
+- `run_simulation_study()` — A function for running a `Simulation`
+  across varied sample sizes.
+
+See `?Simulation` and `?run_simulation_study()`.
+
 ## Demonstration
 
 ``` r
-library(Simulacron3) 
+library(Simulacron3)
 # the only thing Simulacron3 contains is the Simulation R6 Class, used below
 
 # Example Usage
@@ -62,16 +76,17 @@ sim$run()
 
 # Retrieve results
 results <- sim$get_results()
+
 head(results)
 ```
 
-    ##       mean_est   var_est
-    ## 1 -0.000358145 1.0029123
-    ## 2  0.014233217 0.9832642
-    ## 3 -0.053425707 0.9297267
-    ## 4  0.004113618 1.0936967
-    ## 5 -0.084775258 0.9653678
-    ## 6  0.022799863 1.0084176
+    ##      mean_est   var_est
+    ## 1 -0.02437416 0.9572821
+    ## 2  0.04051167 1.0650267
+    ## 3  0.05319980 0.9792816
+    ## 4  0.01356421 1.0589115
+    ## 5  0.09553885 1.0395503
+    ## 6  0.01013093 0.9762941
 
 See
 <https://ctesta01.github.io/Simulacron3/articles/Comparing-Estimators.html>
@@ -117,9 +132,11 @@ plans that can be specified.
 `{Simulacron3}` is meant to have easy to understand source code (and not
 too much of it) so that users can easily reason about what to expect
 from their simulations. Check out the source, especially for the
-`$run()` method here:
+`$run()` method of the `Simulation` class and the
+`run_simulation_study()` method:
 
 - <https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R>
+- <https://github.com/ctesta01/Simulacron3/blob/main/R/run_simulation_study.R>
 
 ### Package Title Inspiration
 
