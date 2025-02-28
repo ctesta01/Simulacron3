@@ -13,6 +13,8 @@ workflow:
 
 ![](man/figures/DiagrammeR%20diagram-1.png)
 
+## Demonstration
+
 ``` r
 library(Simulacron3)
 # Example Usage
@@ -25,7 +27,12 @@ estimators <- list(
   var_estimator = function(data) var(data$x)
 )
 
-# Define a summary statistics function
+# Define a summary statistics function 
+# 
+# An estimator can potentially return a lot more data than can be stored
+# in one row of results, so the summary_stats functions are used to 
+# condense that information down.  Here they're not doing very much, but
+# in more advanced simulations we will see why they're crucial. 
 summary_func <- function(iter = NULL, est_results, data = NULL) {
   data.frame(
     mean_est = est_results$mean_estimator,
@@ -54,13 +61,36 @@ results <- sim$get_results()
 head(results)
 ```
 
-    ##       mean_est   var_est
-    ## 1 -0.002687212 0.8894159
-    ## 2  0.069246104 1.0495441
-    ## 3  0.032473984 1.1679176
-    ## 4  0.128928438 1.2523796
-    ## 5 -0.170736066 1.1980035
-    ## 6  0.118114638 1.2049654
+    ##      mean_est   var_est
+    ## 1 -0.20494572 1.3920098
+    ## 2  0.15280055 0.9840259
+    ## 3  0.10258454 1.1538128
+    ## 4 -0.03797317 0.8290765
+    ## 5 -0.27130453 0.9588148
+    ## 6 -0.12555804 1.1249785
+
+## Package Internals
+
+`{Simulacron3}` is meant to have easy to understand source code (and not
+too much of it) so that users can easily reason about what to expect
+from their simulations. Check out the source, especially for the
+`$run()` method here:
+
+- <https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R>
+
+### Package Title Inspiration
+
+To quote Wikipedia:
+
+<img src="https://upload.wikimedia.org/wikipedia/en/7/70/DanielFGalouye-Simulacron-3.jpg" align='left' hspace='15' width='100px' />
+
+> Simulacron-3 (1964), by Daniel F. Galouye, is an American science
+> fiction novel featuring an early literary description of a simulated
+> reality. <br><br> … As time and events unwind, \[Fuller\]
+> progressively grasps that his own world is probably not “real” and
+> might be only a computer-generated simulation.
+
+<br><br>
 
 ## Other Related Works
 

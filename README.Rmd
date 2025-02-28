@@ -14,6 +14,8 @@ statistical performance of estimators) follow the following workflow:
 
 ![](man/figures/DiagrammeR diagram-1.png)
 
+## Demonstration
+
 ```{r}
 library(Simulacron3)
 # Example Usage
@@ -54,7 +56,28 @@ sim$run()
 # Retrieve results
 results <- sim$get_results()
 head(results)
-``
+```
+
+## Package Internals 
+
+`{Simulacron3}` is meant to have easy to understand source code (and
+not too much of it) so that users can easily reason about what to expect
+from their simulations. Check out the source, especially for the `$run()` method
+here: 
+
+  - <https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R>
+
+### Package Title Inspiration
+
+To quote Wikipedia: 
+
+<img src="https://upload.wikimedia.org/wikipedia/en/7/70/DanielFGalouye-Simulacron-3.jpg" align='left' hspace='15' width='100px' />
+
+> Simulacron-3 (1964), by Daniel F. Galouye, is an American science fiction novel featuring an early literary description of a simulated reality. <br><br>
+> ... As time and events unwind, [Fuller] progressively grasps that his own world is
+probably not "real" and might be only a computer-generated simulation.
+
+<br><br>
 
 ## Other Related Works
 

@@ -67,6 +67,9 @@
 <p>The purpose of the <a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a> package is to provide easy-to-use boilerplate functionality for simple simulation studies. The most common, archetypal example of a usecase would be comparing the performance of multiple estimators as the sample size of training data increases.</p>
 <p>A fundamental thesis of this package is that many simulation studies (of the statistical performance of estimators) follow the following workflow:</p>
 <p><img src="reference/figures/DiagrammeR%20diagram-1.png"></p>
+<div class="section level2">
+<h2 id="demonstration">Demonstration<a class="anchor" aria-label="anchor" href="#demonstration"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a></span><span class="op">)</span></span>
 <span><span class="co"># Example Usage</span></span>
@@ -79,7 +82,12 @@
 <span>  var_estimator <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Define a summary statistics function</span></span>
+<span><span class="co"># Define a summary statistics function </span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># An estimator can potentially return a lot more data than can be stored</span></span>
+<span><span class="co"># in one row of results, so the summary_stats functions are used to </span></span>
+<span><span class="co"># condense that information down.  Here they're not doing very much, but</span></span>
+<span><span class="co"># in more advanced simulations we will see why they're crucial. </span></span>
 <span><span class="va">summary_func</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">iter</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">est_results</span>, <span class="va">data</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    mean_est <span class="op">=</span> <span class="va">est_results</span><span class="op">$</span><span class="va">mean_estimator</span>,</span>
@@ -103,13 +111,34 @@
 <code class="sourceCode R"><span><span class="co"># Retrieve results</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="va">sim</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">##       mean_est   var_est</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="do">## 1 -0.002687212 0.8894159</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## 2  0.069246104 1.0495441</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">## 3  0.032473984 1.1679176</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">## 4  0.128928438 1.2523796</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="do">## 5 -0.170736066 1.1980035</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="do">## 6  0.118114638 1.2049654</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">##      mean_est   var_est</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="do">## 1  0.11005384 1.0486198</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## 2  0.01653653 0.7218143</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">## 3 -0.08883892 1.0054565</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">## 4 -0.02003580 0.9023866</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="do">## 5  0.05607333 1.1312612</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="do">## 6  0.06813891 1.0419888</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="package-internals">Package Internals<a class="anchor" aria-label="anchor" href="#package-internals"></a>
+</h2>
+<p><a href="https://ctesta01.github.io/Simulacron3/">Simulacron3</a> is meant to have easy to understand source code (and not too much of it) so that users can easily reason about what to expect from their simulations. Check out the source, especially for the <code>$run()</code> method here:</p>
+<ul>
+<li><a href="https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R" class="external-link uri">https://github.com/ctesta01/Simulacron3/blob/main/R/Simulation.R</a></li>
+</ul>
+<div class="section level3">
+<h3 id="package-title-inspiration">package title inspiration<a class="anchor" aria-label="anchor" href="#package-title-inspiration"></a>
+</h3>
+<p>To quote Wikipedia:</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/en/7/70/DanielFGalouye-Simulacron-3.jpg" align="left" hspace="15" width="100px"></p>
+<blockquote>
+<p>Simulacron-3 (1964), by Daniel F. Galouye, is an American science fiction novel featuring an early literary description of a simulated reality.</p>
+</blockquote>
+<blockquote>
+<p>As time and events unwind, [Fuller] progressively grasps that his own world is probably not “real” and might be only a computer-generated simulation.</p>
+</blockquote>
+</div>
+</div>
 <div class="section level2">
 <h2 id="other-related-works">Other Related Works<a class="anchor" aria-label="anchor" href="#other-related-works"></a>
 </h2>
